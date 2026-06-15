@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Beanjoy報價單">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#2a7a3a">
+<link rel="manifest" id="pwa-manifest">
+<link rel="apple-touch-icon" id="pwa-icon">
+<script>
+// 動態建立 manifest
+const manifest = {
+  name: "Beanjoy 報價單審核系統",
+  short_name: "BJ報價單",
+  description: "中港興食品股份有限公司 報價單審核管理系統",
+  start_url: "./",
+  display: "standalone",
+  background_color: "#2a7a3a",
+  theme_color: "#2a7a3a",
+  orientation: "portrait",
+  icons: [
+    { src: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%232a7a3a'/><text x='96' y='130' font-family='Arial' font-size='120' font-weight='bold' fill='white' text-anchor='middle'>B</text></svg>`), sizes: "192x192", type: "image/svg+xml" },
+    { src: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%232a7a3a'/><text x='256' y='350' font-family='Arial' font-size='320' font-weight='bold' fill='white' text-anchor='middle'>B</text></svg>`), sizes: "512x512", type: "image/svg+xml" }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+const url = URL.createObjectURL(blob);
+document.getElementById('pwa-manifest').href = url;
+
+// iOS apple touch icon (綠色B字)
+const iconSvg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%232a7a3a'/><text x='90' y='130' font-family='Arial' font-size='110' font-weight='bold' fill='white' text-anchor='middle'>B</text></svg>`;
+const iconBlob = new Blob([iconSvg], {type: 'image/svg+xml'});
+const iconUrl = URL.createObjectURL(iconBlob);
+document.getElementById('pwa-icon').href = iconUrl;
+</script>
+<title>Beanjoy 報價單審核系統 — 中港興食品股份有限公司</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+/* icons: inline SVG */
+.ba .ti{font-size:13px;vertical-align:-2px}
+.sb-item .ti{font-size:15px;vertical-align:-2px}
+.tag .ti{font-size:10px;vertical-align:-1px}
+.qm .ti{font-size:11px;vertical-align:-1px}
+.rc-meta .ti{font-size:11px;vertical-align:-1px}
+.rc-dropdown-item .ti{font-size:14px;vertical-align:-2px}
+.rlabel .ti{font-size:12px;vertical-align:-1px}
+.fl-label .ti{font-size:12px;vertical-align:-1px}
+.mini-sec-lbl .ti{font-size:13px;vertical-align:-2px}
+.sample-note .ti{font-size:12px;vertical-align:-1px}
+.modal-title .ti{font-size:16px;vertical-align:-2px}
+.page-title .ti{font-size:16px;vertical-align:-2px}
+.sent-sec-hd .ti{font-size:14px;vertical-align:-2px}
+.subsec-header .ti{font-size:15px;vertical-align:-2px}
+.confirm-title .ti{font-size:15px;vertical-align:-2px}
+.rc-icon .ti{font-size:17px;vertical-align:-2px}
+.lb-title .ti{font-size:13px;vertical-align:-2px}
+.lb-title-tag .ti,.role-btn .ti{font-size:13px;vertical-align:-1px}
+:root{
+  --bg:#F5F5F5;--bg2:#EBEBEB;--bg3:#FFFFFF;
+  --border:#DEDEDE;--border2:#E8E8E8;
+  --text:#1A1A1A;--text2:#555;--text3:#888;
+  --green:#2a7a3a;--green-light:#E8F5EC;--green-mid:#5DCAA5;
+  --amber:#BA7517;--amber-light:#FAEEDA;
+  --red:#A32D2D;--red-light:#FCEBEB;
+  --blue:#185FA5;--blue-light:#E6F1FB;
+  --purple:#534AB7;--purple-light:#EEEDFE;
+  --radius:8px;--shadow:0 2px 8px rgba(0,0,0,.10);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.shell{display:flex;flex-direction:column;min-height:100vh}
+
+/* ── Topbar ── */
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right));display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:30}
+.brand{display:flex;align-items:center;gap:12px}
+.brand svg{flex-shrink:0}
+.brand-info{line-height:1.3}
+.brand-slogan{font-size:9px;color:var(--text3);font-style:italic;letter-spacing:.3px}
+.brand-company{font-size:11px;color:var(--text2);font-weight:500}
+.role-sw{display:flex;gap:3px;background:var(--bg2);border-radius:8px;padding:3px}
+.role-btn{padding:5px 14px;font-size:13px;border:none;background:transparent;border-radius:6px;cursor:pointer;color:var(--text2);font-weight:400;transition:all .15s}
+.role-btn.active{background:#fff;color:var(--green);font-weight:600;border:1px solid var(--green-mid);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+
+/* ── Layout ── */
+.body{display:flex;flex:1;min-height:0}
+.sidebar{width:190px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);padding:12px 0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+.content{flex:1;padding:20px;min-width:0;overflow-y:auto}
+
+/* ── Sidebar ── */
+.sb-sec-label{font-size:10px;font-weight:600;color:var(--text3);padding:10px 16px 4px;letter-spacing:.5px;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:8px;padding:8px 16px;cursor:pointer;font-size:13px;color:var(--text2);border-left:2.5px solid transparent;transition:all .12s;user-select:none}
+.sb-item:hover{background:var(--green-light);color:var(--green)}
+.sb-item.active{color:var(--green);border-left-color:var(--green);font-weight:600;background:#E0F2E6}
+.sb-item i{font-size:15px;flex-shrink:0}
+.sb-badge{margin-left:auto;font-size:10px;padding:2px 7px;border-radius:12px;font-weight:600}
+.bc-amber{background:var(--amber-light);color:var(--amber)}
+.bc-green{background:#D4EDDA;color:#1a6b2a}
+.bc-red{background:var(--red-light);color:var(--red)}
+.bc-blue{background:var(--blue-light);color:var(--blue)}
+.bc-gray{background:#F1EFE8;color:#5F5E5A}
+.bc-teal{background:#D4EDDA;color:#1a6b2a}
+.sb-divider{border:none;border-top:1px solid var(--border2);margin:8px 16px}
+
+/* ── Page header ── */
+.page-hd{margin-bottom:16px}
+.page-title{font-size:16px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.page-sub{font-size:12px;color:var(--text3);margin-top:3px}
+
+/* ── Stats ── */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat-c{background:#fff;border-radius:var(--radius);padding:12px 14px;border:1px solid var(--border2)}
+.stat-label{font-size:11px;color:var(--text3);margin-bottom:5px}
+.stat-val{font-size:20px;font-weight:600}
+.sv-a{color:var(--amber)}.sv-g{color:var(--green)}.sv-r{color:var(--red)}.sv-b{color:var(--blue)}
+
+/* ── Cards ── */
+.card-list{display:flex;flex-direction:column;gap:10px}
+.qcard{background:#fff;border:1px solid var(--border2);border-radius:var(--radius);padding:14px;transition:opacity .2s,transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.qcard.moving{opacity:0;transform:translateY(-6px)}
+.qcard.bl-pass{border-left:3px solid var(--green-mid)}
+.qcard.bl-rej{border-left:3px solid #E24B4A}
+.result-card{border-radius:var(--radius);padding:14px 16px;transition:opacity .2s,transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.result-card.moving{opacity:0;transform:translateY(-6px)}
+.result-card.rc-deal{background:#E8F5EC;border:1px solid var(--green-mid)}
+.result-card.rc-nodeal{background:var(--red-light);border:1px solid #F09595}
+.rc-inner{display:flex;align-items:flex-start;gap:12px}
+.rc-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.rc-icon.deal{background:var(--green)}.rc-icon.nodeal{background:var(--red)}
+.rc-body{flex:1;min-width:0}
+.rc-client{font-size:13px;font-weight:600;margin-bottom:2px}
+.rc-client.deal{color:#1a5c2a}.rc-client.nodeal{color:#791F1F}
+.rc-id{font-size:11px;margin-bottom:6px}
+.rc-id.deal{color:var(--green)}.rc-id.nodeal{color:var(--red)}
+.rc-status-line{font-size:12px;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rc-status-line.deal{color:#1a5c2a}.rc-status-line.nodeal{color:#791F1F}
+.rc-reason{font-size:11px;padding:6px 10px;border-radius:6px;margin-top:6px;line-height:1.6}
+.rc-reason.nodeal{background:#F7C1C1;color:#501313}
+.rc-meta{font-size:11px;display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+.rc-meta.deal{color:var(--green)}.rc-meta.nodeal{color:#993C1D}
+.rc-meta span{display:flex;align-items:center;gap:3px}
+.rc-menu-wrap{position:relative;flex-shrink:0}
+.rc-dots{width:28px;height:28px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:16px;transition:background .12s}
+.rc-dots:hover{background:rgba(0,0,0,.08)}
+.rc-dropdown{position:absolute;top:32px;right:0;background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:4px;min-width:160px;z-index:20;box-shadow:var(--shadow)}
+.rc-dropdown-item{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:12px;cursor:pointer;border-radius:6px;color:var(--text);white-space:nowrap}
+.rc-dropdown-item:hover{background:var(--bg2)}
+.rc-dropdown-item.danger{color:var(--red)}.rc-dropdown-item.danger:hover{background:var(--red-light)}
+.rc-dropdown-divider{border:none;border-top:1px solid var(--border2);margin:3px 0}
+
+/* ── Card inner ── */
+.qn{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.qi{font-size:11px;color:var(--text3);margin-bottom:7px}
+.qm{font-size:11px;color:var(--text2);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.qm span{display:flex;align-items:center;gap:3px}
+.tag-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.tag{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.tag.sent{background:var(--blue-light);color:var(--blue)}
+.tag.sample{background:var(--purple-light);color:var(--purple)}
+.tag.ship{background:var(--green-light);color:var(--green)}
+.rbox{border-radius:7px;padding:8px 12px;margin-bottom:10px;font-size:12px}
+.rbox.rj{background:var(--bg2);border:1px solid #F0997B}
+.rlabel{font-size:11px;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.rlabel.rj{color:#993C1D}
+.thumbs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.th{width:48px;height:48px;border-radius:7px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;flex-shrink:0}
+.th.q-type{background:#EBF3FF}.th.v-type{background:#E8F5EF}
+.th:hover{transform:scale(1.08);box-shadow:var(--shadow)}
+.th-label{position:absolute;bottom:0;left:0;right:0;font-size:9px;text-align:center;padding:1px 0;font-weight:600;line-height:1.4}
+.th.q-type .th-label{background:rgba(24,95,165,.4);color:#fff}
+.th.v-type .th-label{background:rgba(42,122,58,.4);color:#fff}
+.sample-note{font-size:11px;color:var(--text2);margin-bottom:6px;background:var(--bg2);padding:5px 10px;border-radius:6px;display:flex;align-items:flex-start;gap:5px}
+
+/* ── Actions ── */
+.act-p{display:flex;gap:6px;margin-bottom:8px}
+.act-s{display:flex;align-items:center;gap:7px;padding-top:10px;border-top:1px solid var(--border2)}
+.act-s-left{display:flex;align-items:center;gap:6px;flex:1}
+.act-s-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.act-s-div{width:1px;height:26px;background:var(--border2);margin:0 2px}
+.ba{padding:6px 13px;font-size:12px;font-weight:500;border:none;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;transition:all .15s}
+.ba.approve{background:var(--green);color:#fff}.ba.approve:hover{background:#225f2e}
+.ba.reject{border:1px solid var(--red);background:transparent;color:var(--red)}.ba.reject:hover{background:var(--red-light)}
+.ba.sent-off{border:1px solid var(--border);background:transparent;color:var(--text2)}.ba.sent-off:hover{background:var(--bg2)}
+.ba.sent-on{border:1px solid var(--blue);background:var(--blue-light);color:var(--blue)}
+.ba.deal-btn{background:#D4EDDA;color:#1a5c2a;border:1.5px solid var(--green-mid)}.ba.deal-btn:hover{background:#b3e0be}.ba.deal-btn.selected{background:var(--green);color:#fff;border-color:var(--green)}
+.ba.nodeal-btn{background:var(--red-light);color:#791F1F;border:1.5px solid #F09595}.ba.nodeal-btn:hover{background:#F7C1C1}.ba.nodeal-btn.selected{background:var(--red);color:#fff;border-color:var(--red)}
+.ba.resub{background:var(--amber);color:#fff;width:100%;justify-content:center}.ba.resub:hover{opacity:.88}
+.slbl{font-size:11px;color:var(--text3)}
+.empty-st{text-align:center;padding:36px 20px;color:var(--text3);font-size:13px;border:1.5px dashed var(--border);border-radius:var(--radius)}
+.upload-cta{background:#fff;border:2px dashed var(--green-mid);border-radius:var(--radius);padding:18px;text-align:center;margin-bottom:16px;cursor:pointer;transition:all .15s}
+.upload-cta:hover{border-color:var(--green);background:var(--green-light)}
+.two-section{display:flex;flex-direction:column;gap:20px}
+.subsec-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border2)}
+.subsec-badge{font-size:11px;padding:2px 8px;border-radius:12px;font-weight:600}
+.sent-section{margin-bottom:24px}
+.sent-sec-hd{display:flex;align-items:center;gap:7px;margin-bottom:12px;padding:7px 12px;border-radius:7px}
+.sent-sec-hd.deal-hd{background:#E8F5EC}.sent-sec-hd.nodeal-hd{background:var(--red-light)}.sent-sec-hd.pending-hd{background:var(--blue-light)}
+
+/* ── Lightbox ── */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;flex-direction:column;z-index:9999;user-select:none;-webkit-overflow-scrolling:touch}
+.lb-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.1);min-height:60px}
+.lb-title{font-size:14px;font-weight:500;color:#fff;display:flex;align-items:center;gap:10px}
+.lb-title-tag{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600}
+.lb-title-tag.q{background:var(--blue);color:#fff}.lb-title-tag.v{background:var(--green);color:#fff}
+.lb-close{background:#fff;border:none;color:#111;width:48px;height:48px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.lb-close:hover,.lb-close:active{background:#ddd}
+.lb-body{flex:1;display:flex;align-items:center;justify-content:center;padding:16px;position:relative;min-height:0}
+.lb-img-real{max-width:100%;max-height:100%;border-radius:10px;object-fit:contain;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.lb-mock-img{background:rgba(255,255,255,.08);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:48px 72px;color:rgba(255,255,255,.7)}
+.lb-mock-img i{font-size:56px}
+.lb-mock-img span{font-size:14px}
+.lb-mock-img .lb-hint{font-size:11px;color:rgba(255,255,255,.4);margin-top:4px}
+.lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);border:none;color:#fff;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.lb-prev{left:12px}.lb-next{right:12px}
+.lb-prev:hover,.lb-next:hover{background:rgba(255,255,255,.3)}
+.lb-prev:disabled,.lb-next:disabled{opacity:.2;cursor:default}
+.lb-footer{display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;flex-shrink:0;flex-wrap:wrap}
+.lb-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:background .15s}
+.lb-dot.active{background:#fff}
+.lb-counter{font-size:12px;color:rgba(255,255,255,.5);margin-left:10px}
+
+/* ── Confirm ── */
+.confirm-wrap{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:80}
+.confirm-box{background:#fff;border-radius:12px;padding:22px 24px;width:320px;box-shadow:var(--shadow)}
+.confirm-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.confirm-sub{font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.6}
+.confirm-btns{display:flex;gap:8px;justify-content:flex-end}
+.cbtn{padding:7px 16px;font-size:13px;border-radius:7px;cursor:pointer;font-weight:500;border:none}
+.cbtn.cancel{border:1px solid var(--border);background:transparent;color:var(--text2)}
+.cbtn.confirm-deal{background:var(--green);color:#fff}
+.cbtn.confirm-nodeal{background:var(--red);color:#fff}
+.cbtn.confirm-clear{background:#5F5E5A;color:#fff}
+
+/* ── Modal ── */
+.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding-top:40px;z-index:50}
+.modal{background:#fff;border-radius:14px;padding:22px;width:480px;max-width:96%;max-height:84vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.modal-title{font-size:15px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--text3);margin-bottom:16px}
+.fl{margin-bottom:13px}
+.fl-label{font-size:12px;color:var(--text2);margin-bottom:5px;display:flex;align-items:center;gap:4px;font-weight:500}
+.fl-required{color:var(--red);font-size:12px}
+.fl input[type=text],.fl textarea,.fl select{width:100%;padding:9px 12px;font-size:13px;border:1px solid var(--border);border-radius:7px;background:#fff;color:var(--text);font-family:inherit;transition:border-color .15s}
+.fl input[type=text]:focus,.fl textarea:focus,.fl select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(42,122,58,.1)}
+.fl select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.fl textarea{resize:vertical;min-height:80px;line-height:1.5}
+.radio-row{display:flex;gap:16px;margin-top:5px}
+.radio-opt{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;color:var(--text)}
+.radio-opt input[type=radio]{accent-color:var(--green);width:15px;height:15px;cursor:pointer}
+.upload-sm{border:1.5px dashed var(--border);border-radius:7px;padding:12px;text-align:center;cursor:pointer;font-size:12px;color:var(--text3);margin-bottom:4px;transition:all .15s}
+.upload-sm:hover{border-color:var(--green);background:var(--green-light)}
+.pf{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.pf span{background:var(--bg2);border:1px solid var(--border2);border-radius:5px;padding:3px 8px;font-size:11px;color:var(--text2);display:flex;align-items:center;gap:3px}
+.divhr{border:none;border-top:1px solid var(--border2);margin:14px 0}
+.mini-sec-lbl{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sample-box{background:var(--purple-light);border-radius:8px;padding:12px 14px;border:1px solid rgba(83,74,183,.15)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;padding-top:14px;border-top:1px solid var(--border2)}
+.mf-cancel{padding:7px 16px;font-size:13px;border:1px solid var(--border);border-radius:7px;background:transparent;cursor:pointer;color:var(--text2);font-weight:500}
+.mf-ok{padding:7px 16px;font-size:13px;color:#fff;border:none;border-radius:7px;cursor:pointer;font-weight:500}
+.mf-ok.green{background:var(--green)}.mf-ok.green:hover{background:#225f2e}
+.mf-ok.red{background:var(--red)}.mf-ok.gray{background:#5F5E5A}
+
+/* ── Notif ── */
+#_ntf{position:fixed;top:16px;right:16px;color:#fff;padding:10px 18px;border-radius:9px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:var(--shadow)}
+
+/* ── Responsive ── */
+@media(max-width:680px){
+  .sidebar{display:none}
+  .body{flex-direction:column}
+  .content{padding:12px;padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .act-s{flex-wrap:wrap;gap:6px}
+  .act-s-div{display:none}
+  .topbar{padding:0 12px;height:48px}
+  .brand svg{width:90px;height:26px}
+  .brand-company{font-size:10px}
+  .modal-wrap{padding-top:16px}
+  .modal{max-height:92vh}
+}
+/* ── Bottom nav (mobile only) ── */
+.bottom-nav{display:none}
+@media(max-width:680px){
+  .bottom-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;
+    background:#fff;border-top:1px solid var(--border);
+    z-index:40;padding:0;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .bn-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:8px 4px 10px;cursor:pointer;color:var(--text3);font-size:10px;gap:3px;
+    border:none;background:transparent;user-select:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .bn-item.active{color:var(--green)}
+  .bn-item svg{width:20px;height:20px}
+  .bn-more-menu{
+    position:fixed;bottom:60px;left:0;right:0;
+    background:#fff;border-top:1px solid var(--border);
+    padding:12px 0 8px;z-index:39;display:none;
+    box-shadow:0 -4px 16px rgba(0,0,0,.08);
+  }
+  .bn-more-menu.open{display:block}
+  .bn-more-item{
+    display:flex;align-items:center;gap:12px;padding:12px 20px;
+    font-size:14px;color:var(--text);cursor:pointer;
+  }
+  .bn-more-item:active{background:var(--bg2)}
+  .bn-more-item.active{color:var(--green);font-weight:600}
+  .bn-more-item svg{width:18px;height:18px;flex-shrink:0}
+  .bn-badge{
+    background:var(--amber-light);color:var(--amber);
+    font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px;margin-left:auto;
+  }
+  .bn-badge.green{background:#D4EDDA;color:#1a6b2a}
+  .bn-badge.red{background:var(--red-light);color:var(--red)}
+  .bn-badge.blue{background:var(--blue-light);color:var(--blue)}
+}
+
+/* ── Login overlay ── */
+.login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#1a5c2a 0%,#2a7a3a 50%,#3a9e50 100%);display:flex;align-items:center;justify-content:center;z-index:1000}
+.login-box{background:#fff;border-radius:16px;padding:36px 32px;width:320px;max-width:92vw;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.login-logo{margin-bottom:20px}
+.login-title{font-size:17px;font-weight:700;color:#1A1A1A;margin-bottom:6px}
+.login-sub{font-size:13px;color:#888;margin-bottom:24px}
+.login-input{width:100%;padding:12px 14px;font-size:15px;border:1.5px solid #DEDEDE;border-radius:9px;margin-bottom:16px;font-family:inherit;text-align:center;color:#1A1A1A}
+.login-input:focus{outline:none;border-color:#2a7a3a;box-shadow:0 0 0 3px rgba(42,122,58,.1)}
+.login-btn{width:100%;padding:13px;font-size:15px;font-weight:600;background:#2a7a3a;color:#fff;border:none;border-radius:9px;cursor:pointer}
+.login-btn:hover{background:#225f2e}
+.login-err{font-size:12px;color:#A32D2D;margin-top:-8px;margin-bottom:12px;display:none}
+/* ── API status indicator ── */
+.api-status{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;margin-left:8px}
+.api-status.online{background:#D4EDDA;color:#1a6b2a}
+.api-status.offline{background:#FAEEDA;color:#854F0B}
+.api-status.loading{background:#E6F1FB;color:#185FA5}
+/* ── Loading spinner ── */
+.spinner-wrap{display:flex;align-items:center;justify-content:center;padding:40px;color:#888;gap:12px;font-size:14px}
+.spinner{width:24px;height:24px;border:2px solid #E8E8E8;border-top-color:#2a7a3a;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+</style>
+</head>
+<body>
+
+<!-- Login overlay -->
+<div class="login-overlay" id="login-overlay" style="display:none">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg width="90" height="26" viewBox="0 0 260 72" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="46" font-family="Arial,sans-serif" font-size="50" font-weight="700" fill="#555">Beanj</text>
+        <g transform="translate(154,8)">
+          <ellipse cx="18" cy="6" rx="10" ry="14" fill="#3a9e50"/>
+          <ellipse cx="30" cy="18" rx="14" ry="10" fill="#3a9e50"/>
+          <ellipse cx="18" cy="30" rx="10" ry="14" fill="#3a9e50"/>
+          <ellipse cx="6" cy="18" rx="14" ry="10" fill="#3a9e50"/>
+          <circle cx="18" cy="18" r="14" fill="none" stroke="#111" stroke-width="3.5"/>
+          <rect x="10" y="10" width="16" height="16" rx="2" fill="#111"/>
+          <circle cx="18" cy="18" r="6" fill="none" stroke="#3a9e50" stroke-width="2.5"/>
+        </g>
+        <text x="196" y="46" font-family="Arial,sans-serif" font-size="50" font-weight="700" fill="#555">y</text>
+      </svg>
+    </div>
+    <div class="login-title">中港興食品 報價單系統</div>
+    <div class="login-sub">請輸入您的姓名以開始使用</div>
+    <input class="login-input" id="login-name" type="text" placeholder="例：林小明" maxlength="20">
+    <input class="login-input" id="login-pw" type="password" placeholder="請輸入密碼" style="margin-top:-8px">
+    <div class="login-err" id="login-err">請輸入您的姓名</div>
+    <div style="display:flex;gap:10px;margin-bottom:14px">
+      <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border:1.5px solid #DEDEDE;border-radius:8px;cursor:pointer;font-size:13px" id="lbl-sales">
+        <input type="radio" name="login-role" value="sales" checked style="accent-color:#2a7a3a"> 業務人員
+      </label>
+      <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border:1.5px solid #DEDEDE;border-radius:8px;cursor:pointer;font-size:13px" id="lbl-manager">
+        <input type="radio" name="login-role" value="manager" style="accent-color:#2a7a3a"> 業務主管
+      </label>
+    </div>
+    <button class="login-btn" id="login-btn">進入系統</button>
+  </div>
+</div>
+
+<div class="shell" id="shell">
+<div class="topbar">
+  <div class="brand">
+    <svg width="110" height="32" viewBox="0 0 260 72" xmlns="http://www.w3.org/2000/svg">
+      <text x="0" y="46" font-family="Arial,sans-serif" font-size="50" font-weight="700" fill="#666">Beanj</text>
+      <g transform="translate(154,8)">
+        <ellipse cx="18" cy="6" rx="10" ry="14" fill="#3a9e50"/>
+        <ellipse cx="30" cy="18" rx="14" ry="10" fill="#3a9e50"/>
+        <ellipse cx="18" cy="30" rx="10" ry="14" fill="#3a9e50"/>
+        <ellipse cx="6" cy="18" rx="14" ry="10" fill="#3a9e50"/>
+        <circle cx="18" cy="18" r="14" fill="none" stroke="#111" stroke-width="3.5"/>
+        <rect x="10" y="10" width="16" height="16" rx="2" fill="#111"/>
+        <circle cx="18" cy="18" r="6" fill="none" stroke="#3a9e50" stroke-width="2.5"/>
+      </g>
+      <text x="196" y="46" font-family="Arial,sans-serif" font-size="50" font-weight="700" fill="#666">y</text>
+    </svg>
+    <div class="brand-info">
+      <div class="brand-slogan">Beanjoy, Bean go life!</div>
+      <div class="brand-company">中港興食品股份有限公司</div>
+    </div>
+  </div>
+  <div class="role-sw" id="role-sw">
+    <button class="role-btn active" data-role="sales"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:13px;height:13px;margin-right:3px"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>業務人員</button>
+    <button class="role-btn" data-role="manager"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:13px;height:13px;margin-right:3px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>業務主管</button>
+  </div>
+</div>
+<div class="body">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="content" id="content"></div>
+</div>
+</div>
+
+<div id="_ntf"></div>
+
+<script>
+(function(){
+'use strict';
+
+// ══════════════════════════════════════════
+//  設定區 — 部署後填入 Apps Script 網址
+// ══════════════════════════════════════════
+const API_URL = 'https://script.google.com/macros/s/AKfycbznOUIWU0r93OY6CG5qORU3pN733SoNunu-cCXfwzX96tKzn6EunncpBTmXQF6wDdb3lQ/exec';  // 填入 Google Apps Script 部署網址
+                     // 例：'https://script.google.com/macros/s/AKfy.../exec'
+
+// ── 本機模式（API_URL 為空時使用內建假資料）──
+const LOCAL_MODE = !API_URL;
+
+// ── 目前登入的使用者 ──
+let currentUser = localStorage.getItem('bj_user') || '';
+let currentUserRole = localStorage.getItem('bj_role') || 'sales';
+
+
+// ── SVG icon helper (fully self-contained, works everywhere) ──
+const _SVGP = {
+  'ti-alert-circle':'<circle cx=\"12\" cy=\"12\" r=\"10\"/><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"/><line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"/>',
+  'ti-alert-triangle':'<path d=\"M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z\"/><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/>',
+  'ti-building-store':'<path d=\"M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z\"/><polyline points=\"9 22 9 12 15 12 15 22\"/>',
+  'ti-calendar':'<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/>',
+  'ti-check':'<polyline points=\"20 6 9 17 4 12\"/>',
+  'ti-checks':'<path d=\"M7 12l5 5 10-10\"/><path d=\"M2 12l5 5\"/>',
+  'ti-chevron-left':'<polyline points=\"15 18 9 12 15 6\"/>',
+  'ti-chevron-right':'<polyline points=\"9 18 15 12 9 6\"/>',
+  'ti-circle-check':'<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9 12l2 2 4-4\"/>',
+  'ti-circle-x':'<circle cx=\"12\" cy=\"12\" r=\"10\"/><line x1=\"15\" y1=\"9\" x2=\"9\" y2=\"15\"/><line x1=\"9\" y1=\"9\" x2=\"15\" y2=\"15\"/>',
+  'ti-clock':'<circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/>',
+  'ti-cloud-upload':'<polyline points=\"16 16 12 12 8 16\"/><line x1=\"12\" y1=\"12\" x2=\"12\" y2=\"21\"/><path d=\"M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3\"/>',
+  'ti-dots':'<circle cx=\"5\" cy=\"12\" r=\"1.5\"/><circle cx=\"12\" cy=\"12\" r=\"1.5\"/><circle cx=\"19\" cy=\"12\" r=\"1.5\"/>',
+  'ti-edit':'<path d=\"M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7\"/><path d=\"M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z\"/>',
+  'ti-file-invoice':'<path d=\"M14 3v4a1 1 0 001 1h4\"/><path d=\"M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z\"/><line x1=\"9\" y1=\"9\" x2=\"10\" y2=\"9\"/><line x1=\"9\" y1=\"13\" x2=\"15\" y2=\"13\"/><line x1=\"9\" y1=\"17\" x2=\"15\" y2=\"17\"/>',
+  'ti-file-plus':'<path d=\"M14 3v4a1 1 0 001 1h4\"/><path d=\"M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z\"/><line x1=\"12\" y1=\"11\" x2=\"12\" y2=\"17\"/><line x1=\"9\" y1=\"14\" x2=\"15\" y2=\"14\"/>',
+  'ti-handshake':'<path d=\"M20.42 4.58a5.4 5.4 0 00-7.65 0l-.77.78-.77-.78a5.4 5.4 0 00-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z\"/>',
+  'ti-inbox':'<polyline points=\"22 12 16 12 14 15 10 15 8 12 2 12\"/><path d=\"M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z\"/>',
+  'ti-info-circle':'<circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"11 12 12 12 12 16 13 16\"/>',
+  'ti-mood-sad':'<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M16.5 16.5a3.5 3.5 0 00-5 0\"/><line x1=\"8.5\" y1=\"11.5\" x2=\"8.51\" y2=\"11.5\"/><line x1=\"15.5\" y1=\"11.5\" x2=\"15.51\" y2=\"11.5\"/>',
+  'ti-note':'<path d=\"M13 20l7-7\"/><path d=\"M3 7a2 2 0 012-2h14a2 2 0 012 2v6l-7 7H5a2 2 0 01-2-2V7z\"/>',
+  'ti-notes':'<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"2\"/><line x1=\"9\" y1=\"7\" x2=\"15\" y2=\"7\"/><line x1=\"9\" y1=\"11\" x2=\"15\" y2=\"11\"/><line x1=\"9\" y1=\"15\" x2=\"13\" y2=\"15\"/>',
+  'ti-package':'<path d=\"M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z\"/><polyline points=\"3.27 6.96 12 12.01 20.73 6.96\"/><line x1=\"12\" y1=\"22.08\" x2=\"12\" y2=\"12\"/>',
+  'ti-photo':'<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"/><circle cx=\"8.5\" cy=\"8.5\" r=\"1.5\"/><polyline points=\"21 15 16 10 5 21\"/>',
+  'ti-refresh':'<polyline points=\"23 4 23 10 17 10\"/><path d=\"M20.49 15a9 9 0 11-2.12-9.36L23 10\"/>',
+  'ti-rotate':'<path d=\"M20 11A8.1 8.1 0 004.5 9M4 5v4h4\"/><path d=\"M4 13a8.1 8.1 0 0015.5 2m.5 4v-4h-4\"/>',
+  'ti-send':'<line x1=\"22\" y1=\"2\" x2=\"11\" y2=\"13\"/><polygon points=\"22 2 15 22 11 13 2 9 22 2\"/>',
+  'ti-shield-check':'<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z\"/><path d=\"M9 12l2 2 4-4\"/>',
+  'ti-tag':'<path d=\"M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z\"/><line x1=\"7\" y1=\"7\" x2=\"7.01\" y2=\"7\"/>',
+  'ti-truck':'<rect x=\"1\" y=\"3\" width=\"15\" height=\"13\"/><polygon points=\"16 8 20 8 23 11 23 16 16 16 16 8\"/><circle cx=\"5.5\" cy=\"18.5\" r=\"2.5\"/><circle cx=\"18.5\" cy=\"18.5\" r=\"2.5\"/>',
+  'ti-upload':'<polyline points=\"16 16 12 12 8 16\"/><line x1=\"12\" y1=\"12\" x2=\"12\" y2=\"21\"/><path d=\"M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3\"/>',
+  'ti-user':'<path d=\"M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>',
+  'ti-x':'<line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"/><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"/>'
+};
+const _SVG_ATTRS = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+function icon(name, sz, color, extra) {
+  const id = name.replace(/^(ti|ico)-/, 'ti-');
+  const p = _SVGP[id] || '<circle cx="12" cy="12" r="10"/>';
+  const s = sz || '14px';
+  const st = 'width:' + s + ';height:' + s + ';display:inline-block;vertical-align:-0.15em;flex-shrink:0' + (color ? ';color:' + color : '') + (extra || '');
+  return '<svg ' + _SVG_ATTRS + ' style="' + st + '">' + p + '</svg>';
+}
+
+
+let role='sales', page='pending';
+let fstore={nw:{q:[],v:[]},rs:{q:[],v:[]}};
+let modalEl=null, confirmEl=null, lightboxEl=null, openDropdownId=null;
+let lbFiles=[], lbIdx=0;
+
+// ── 上傳的真實圖片 URL（key: filename, value: dataURL）
+const imageCache = {};
+
+const CATEGORIES=[
+  '冷凍據點盤商',
+  '連鎖總部（大型直營）',
+  '果菜盤商',
+  '區域連鎖總部',
+  '市場（攤位）',
+  '門店、小型連鎖店（兩家以下）'
+];
+
+let quotes=[];
+
+const C=()=>({
+  pending:quotes.filter(q=>q.status==='pending').length,
+  approved:quotes.filter(q=>q.status==='approved').length,
+  approvedUnsent:quotes.filter(q=>q.status==='approved'&&!q.sent).length,
+  rejected:quotes.filter(q=>q.status==='rejected').length,
+  toSend:quotes.filter(q=>q.status==='approved'&&!q.sent).length,
+  sentAll:quotes.filter(q=>q.sent).length,
+  closed:quotes.filter(q=>q.sent).length,
+  deal:quotes.filter(q=>q.deal==='yes').length,
+  nodeal:quotes.filter(q=>q.deal==='no').length,
+});
+
+function navItems(isMgr,c){
+  if(isMgr) return [
+    {sec:'審核管理'},{key:'pending',icon:'ti-clock',label:'待審核',badge:c.pending,bc:'amber'},{div:true},
+    {sec:'已審核'},{key:'approved',icon:'ti-circle-check',label:'審核通過',badge:c.approvedUnsent,bc:'green'},{key:'rejected',icon:'ti-circle-x',label:'審核未通過',badge:c.rejected,bc:'red'},{div:true},
+    {sec:'已結案'},{key:'closed',icon:'ti-archive',label:'全部結案',badge:c.closed,bc:'teal'},{key:'deal',icon:'ti-handshake',label:'達成共識',badge:c.deal,bc:'green'},{key:'nodeal',icon:'ti-x',label:'未達成',badge:c.nodeal,bc:'gray'},
+  ];
+  return [
+    {sec:'我的報價單'},{key:'pending',icon:'ti-clock',label:'待審核',badge:c.pending,bc:'amber'},{key:'approved',icon:'ti-circle-check',label:'已通過',badge:c.approvedUnsent,bc:'green'},{key:'rejected',icon:'ti-circle-x',label:'需修改',badge:c.rejected,bc:'red'},{div:true},
+    {sec:'已結案'},{key:'closed',icon:'ti-archive',label:'全部結案',badge:c.closed,bc:'teal'},{key:'deal',icon:'ti-handshake',label:'達成共識',badge:c.deal,bc:'green'},{key:'nodeal',icon:'ti-x',label:'未達成',badge:c.nodeal,bc:'gray'},
+  ];
+}
+
+function renderSidebar(){
+  const c=C(),items=navItems(role==='manager',c);
+  let h='';
+  items.forEach(it=>{
+    if(it.sec) h+=`<div class="sb-sec-label">${it.sec}</div>`;
+    else if(it.div) h+=`<hr class="sb-divider">`;
+    else{
+      const badge=it.badge>0?`<span class="sb-badge bc-${it.bc}">${it.badge}</span>`:'';
+      h+=`<div class="sb-item${page===it.key?' active':''}" data-page="${it.key}">${icon(it.icon,'15px',null)}${it.label}${badge}</div>`;
+    }
+  });
+  document.getElementById('sidebar').innerHTML=h;
+}
+
+// ── Lightbox ──
+function openLightbox(files,idx){closeLightbox();lbFiles=files;lbIdx=idx||0;renderLightbox();}
+function closeLightbox(){
+  if(lightboxEl){document.removeEventListener('keydown',lightboxEl._kh);lightboxEl.remove();lightboxEl=null;}
+}
+function renderLightbox(){
+  if(lightboxEl)lightboxEl.remove();
+  const f=lbFiles[lbIdx];
+  const tagCls=f.type==='q'?'q':'v';
+  const tagLabel=f.type==='q'?'報價單':'廠商資料';
+  const iconName=f.type==='q'?'ti-file-invoice':'ti-building-store';
+  const iconColor=f.type==='q'?'#185FA5':'#2a7a3a';
+  const dots=lbFiles.map((_,i)=>`<div class="lb-dot${i===lbIdx?' active':''}" data-lbidx="${i}"></div>`).join('');
+  const imgUrl=imageCache[f.name]||(f.name.startsWith('http')?f.name:null);
+  const lbUrl=imgUrl&&imgUrl.includes('thumbnail')?imgUrl.replace('sz=w400','sz=w1200'):imgUrl;
+  const imgContent=lbUrl
+    ?`<img class="lb-img-real" src="${lbUrl}" alt="${f.name}" onerror="this.style.display='none'">`
+    :`<div class="lb-mock-img">${icon(iconName,'48px',iconColor)}<span>${f.name}</span><span class="lb-hint">（上傳真實圖片後將在此顯示）</span></div>`;
+  const el=document.createElement('div');el.className='lightbox';
+  el.innerHTML=`
+  <button class="lb-close" id="lb-x" style="position:absolute;top:16px;right:16px;z-index:10001;width:52px;height:52px;background:#fff;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.5)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <div class="lb-body" style="flex:1">
+    <button class="lb-prev" id="lb-pv" ${lbIdx===0?'disabled':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><polyline points="15 18 9 12 15 6"/></svg></button>
+    ${imgContent}
+    <button class="lb-next" id="lb-nx" ${lbIdx===lbFiles.length-1?'disabled':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><polyline points="9 18 15 12 9 6"/></svg></button>
+  </div>
+  <div class="lb-footer">${dots}<span class="lb-counter">${lbIdx+1} / ${lbFiles.length}</span></div>`;
+  document.body.appendChild(el);lightboxEl=el;
+  el.querySelector('#lb-x').addEventListener('click',closeLightbox);
+  // 點背景關閉
+  el.addEventListener('click',function(e){
+    if(e.target===el)closeLightbox();
+  });
+  el.querySelector('#lb-pv').addEventListener('click',()=>{if(lbIdx>0){lbIdx--;renderLightbox();}});
+  el.querySelector('#lb-nx').addEventListener('click',()=>{if(lbIdx<lbFiles.length-1){lbIdx++;renderLightbox();}});
+  el.querySelectorAll('[data-lbidx]').forEach(d=>d.addEventListener('click',function(){lbIdx=parseInt(this.dataset.lbidx);renderLightbox();}));
+  el._kh=function(e){
+    if(e.key==='ArrowLeft'&&lbIdx>0){lbIdx--;renderLightbox();}
+    else if(e.key==='ArrowRight'&&lbIdx<lbFiles.length-1){lbIdx++;renderLightbox();}
+    else if(e.key==='Escape')closeLightbox();
+  };
+  document.addEventListener('keydown',el._kh);
+}
+
+// ── Thumb row ──
+function thumbRow(q){
+  const allFiles=[...q.qf.map(n=>({name:n,type:'q'})),...q.vf.map(n=>({name:n,type:'v'}))];
+  const fj=encodeURIComponent(JSON.stringify(allFiles));
+  let h='<div class="thumbs">';
+  q.qf.forEach((name,i)=>{
+    const imgUrl=imageCache[name]||(name.startsWith('http')?name:null);
+    const inner=imgUrl
+      ?`<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;" alt="${name}"><span class="th-label">報價單</span>`
+      :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:20px;height:20px;color:#185FA5"><path d="M14 3v4a1 1 0 001 1h4"/><path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/><line x1="9" y1="9" x2="10" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg><span class="th-label">報價單</span>`;
+    h+=`<div class="th q-type" data-action="preview" data-files="${fj}" data-idx="${i}" title="點擊預覽：${name}">${inner}</div>`;
+  });
+  q.vf.forEach((name,i)=>{
+    const imgUrl=imageCache[name]||(name.startsWith('http')?name:null);
+    const inner=imgUrl
+      ?`<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;" alt="${name}"><span class="th-label">廠商資料</span>`
+      :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:20px;height:20px;color:#2a7a3a"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="th-label">廠商資料</span>`;
+    h+=`<div class="th v-type" data-action="preview" data-files="${fj}" data-idx="${q.qf.length+i}" title="點擊預覽：${name}">${inner}</div>`;
+  });
+  h+='</div>';return h;
+}
+
+function followActions(q){
+  const sc=q.sent?'ba sent-on':'ba sent-off';
+  const sl=q.sent?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>已傳 ✓`:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>傳給客戶`;
+  let right='';
+  if(q.deal==='yes') right=`<button class="ba deal-btn selected" data-action="clear-deal" data-id="${q.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><path d="M20.42 4.58a5.4 5.4 0 00-7.65 0l-.77.78-.77-.78a5.4 5.4 0 00-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg>達成</button>`;
+  else if(q.deal==='no') right=`<button class="ba nodeal-btn selected" data-action="clear-deal" data-id="${q.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>未達成</button>`;
+  else right=`<button class="ba deal-btn" data-action="deal" data-id="${q.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><path d="M20.42 4.58a5.4 5.4 0 00-7.65 0l-.77.78-.77-.78a5.4 5.4 0 00-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg>達成</button><button class="ba nodeal-btn" data-action="nodeal" data-id="${q.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>未達成</button>`;
+  return `<div class="act-s"><div class="act-s-left"><span class="slbl">傳送</span><button class="${sc}" data-action="sent" data-id="${q.id}">${sl}</button></div><div class="act-s-div"></div><div class="act-s-right">${right}</div></div>`;
+}
+
+function resultCardHtml(q){
+  const isDeal=q.deal==='yes',cls=isDeal?'deal':'nodeal';
+  const statusText=isDeal
+    ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> 已傳送給客戶 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;margin-left:6px"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg> 已達成交易`
+    :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> 已傳送給客戶 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;margin-left:6px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> 未達成交易`;
+  const reason=!isDeal&&q.nodealReason?`<div class="rc-reason nodeal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:12px;height:12px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> 原因：${q.nodealReason}</div>`:'';
+  const isOpen=openDropdownId===q.id;
+  const ddItems=isDeal
+    ?`<div class="rc-dropdown-item" data-action="change-to-nodeal" data-id="${q.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#A32D2D"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>改為未達成</div><div class="rc-dropdown-divider"></div><div class="rc-dropdown-item danger" data-action="clear-result" data-id="${q.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><path d="M20 11A8.1 8.1 0 004.5 9M4 5v4h4"/><path d="M4 13a8.1 8.1 0 0015.5 2m.5 4v-4h-4"/></svg>清除結果</div>`
+    :`<div class="rc-dropdown-item" data-action="change-to-deal" data-id="${q.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#2a7a3a"><path d="M20.42 4.58a5.4 5.4 0 00-7.65 0l-.77.78-.77-.78a5.4 5.4 0 00-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg>改為達成共識</div><div class="rc-dropdown-item" data-action="edit-nodeal-reason" data-id="${q.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>修改未達成原因</div><div class="rc-dropdown-divider"></div><div class="rc-dropdown-item danger" data-action="clear-result" data-id="${q.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><path d="M20 11A8.1 8.1 0 004.5 9M4 5v4h4"/><path d="M4 13a8.1 8.1 0 0015.5 2m.5 4v-4h-4"/></svg>清除結果</div>`;
+  return `<div class="result-card rc-${cls}" id="card-${q.id}">
+    <div class="rc-inner">
+      <div class="rc-icon ${cls}">${icon(isDeal?'ti-handshake':'ti-x','17px','#fff')}</div>
+      <div class="rc-body">
+        <div class="rc-client ${cls}">${q.client}</div>
+        <div class="rc-id ${cls}">${q.id}</div>
+        <div class="rc-status-line ${cls}">${statusText}</div>
+        ${reason}
+        <div class="rc-meta ${cls}">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${q.person}</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>${q.category||'—'}</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>${q.shipMethod||'—'}</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${q.date}</span>
+        </div>
+      </div>
+      <div class="rc-menu-wrap">
+        <button class="rc-dots" data-action="toggle-menu" data-id="${q.id}" title="編輯選項"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></button>
+        ${isOpen?`<div class="rc-dropdown">${ddItems}</div>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function stdCardHtml(q,isMgr,opts){
+  opts=opts||{};
+  const sentTag=q.sent?`<span class="tag sent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:10px;height:10px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> 已傳客戶</span>`:'';
+  const sampTag=q.sample?`<span class="tag sample"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:10px;height:10px"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> 送樣</span>`:'';
+  const shipTag=q.shipMethod?`<span class="tag ship"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:10px;height:10px"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> ${q.shipMethod}</span>`:'';
+  let rejBox='',acts='',borderCls='';
+  if(q.status==='rejected'){
+    borderCls=' bl-rej';
+    if(q.rejectReason) rejBox=`<div class="rbox rj"><div class="rlabel rj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:12px;height:12px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>退件原因</div>${q.rejectReason}</div>`;
+  }
+  if(q.status==='approved') borderCls=' bl-pass';
+  if(isMgr){
+    if(q.status==='pending') acts=`<div class="act-p"><button class="ba approve" data-action="approve" data-id="${q.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>簽核通過</button><button class="ba reject" data-action="reject" data-id="${q.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>退件</button></div>`;
+    else if(q.status==='approved') acts=followActions(q);
+  } else {
+    if(q.status==='rejected') acts=`<button class="ba resub" data-action="resubmit" data-id="${q.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>依備註修改後重新送審</button>`;
+    if(q.status==='approved'&&opts.showFollow) acts=followActions(q);
+  }
+  return `<div class="qcard${borderCls}" id="card-${q.id}">
+    <div class="qn">${q.client}</div>
+    <div class="qi">${q.id}</div>
+    <div class="qm">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${q.person}</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>${q.category||'—'}</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${q.date}</span>
+    </div>
+    ${(sentTag||sampTag||shipTag)?`<div class="tag-row">${sentTag}${sampTag}${shipTag}</div>`:''}
+    ${q.sample&&q.sampleNote?`<div class="sample-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:12px;height:12px;color:#534AB7;margin-top:1px"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><span>送樣備註：${q.sampleNote}</span></div>`:''}
+    ${q.note?`<div class="sample-note" style="background:#EBF3FF;border-left:2px solid #185FA5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;display:inline-block;vertical-align:-0.15em;color:#185FA5;margin-top:1px"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="13" y2="15"/></svg><span>備註：${q.note}</span></div>`:''}
+    ${rejBox}${thumbRow(q)}${acts}
+  </div>`;
+}
+
+function empty(msg){return `<div class="empty-st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:28px;height:28px"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>${msg}</div>`;}
+
+function showConfirm(opts){
+  closeConfirm();
+  const el=document.createElement('div');el.className='confirm-wrap';
+  el.innerHTML=`<div class="confirm-box"><div class="confirm-title">${opts.titleHtml}</div><div class="confirm-sub">${opts.sub}</div><div class="confirm-btns"><button class="cbtn cancel" data-caction="cancel">取消</button><button class="cbtn ${opts.btnCls}" data-caction="ok">${opts.btnLabel}</button></div></div>`;
+  el.addEventListener('click',function(e){const b=e.target.closest('[data-caction]');if(!b)return;if(b.dataset.caction==='ok')opts.onOk();closeConfirm();});
+  document.body.appendChild(el);confirmEl=el;
+}
+function closeConfirm(){if(confirmEl){confirmEl.remove();confirmEl=null;}}
+
+function categoryOpts(selected){return CATEGORIES.map(c=>`<option value="${c}"${c===selected?' selected':''}>${c}</option>`).join('');}
+
+function fileInputHTML(pfx,type,lbl,pvId){
+  return `<label class="upload-sm">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:16px;height:16px"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+    ${lbl}
+    <input type="file" accept="image/*" multiple style="display:none" data-fp="${pfx}" data-ft="${type}">
+  </label><div class="pf" id="${pvId}"></div>`;
+}
+
+function sampleBlock(pfx,existNote){
+  return `<div id="${pfx}-ssec" style="display:none">
+    <div class="sample-box">
+      <div class="fl" style="margin-bottom:0">
+        <div class="fl-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:12px;height:12px;color:#534AB7"><path d="M13 20l7-7"/><path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v6l-7 7H5a2 2 0 01-2-2V7z"/></svg>送樣備註</div>
+        <textarea id="${pfx}-snote" placeholder="例：送樣3件冷凍豆腐、非基改黃豆5公斤，需冷藏包裝...">${existNote||''}</textarea>
+      </div>
+    </div>
+  </div>`;
+}
+
+function bindSampleToggle(pfx){
+  const sec=document.getElementById(pfx+'-ssec');
+  const yesR=document.querySelector(`input[name="${pfx}-samp"][value="yes"]`);
+  const noR=document.querySelector(`input[name="${pfx}-samp"][value="no"]`);
+  if(yesR) yesR.addEventListener('change',function(){if(this.checked)sec.style.display='block';});
+  if(noR) noR.addEventListener('change',function(){if(this.checked)sec.style.display='none';});
+}
+
+function buildModal(type,id){
+  const q=id?quotes.find(q=>q.id===id):null;
+  if(type==='reject'){
+    openModal(`<div class="modal-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#A32D2D"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>退件 — 填寫原因</div>
+      <div class="modal-sub">${q.client}（${q.id}）</div>
+      <div class="fl"><div class="fl-label">退件原因 <span class="fl-required">*</span></div><textarea id="m-reason" placeholder="例：品項規格填寫有誤，請重新確認後送審"></textarea></div>
+      <div class="modal-footer"><button class="mf-cancel" data-maction="close">取消</button><button class="mf-ok red" data-maction="do-reject" data-id="${id}">確認退件</button></div>`);
+  } else if(type==='nodeal'||type==='edit-nodeal'){
+    openModal(`<div class="modal-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#5F5E5A"><circle cx="12" cy="12" r="10"/><path d="M16.5 16.5a3.5 3.5 0 00-5 0"/><line x1="8.5" y1="11.5" x2="8.51" y2="11.5"/><line x1="15.5" y1="11.5" x2="15.51" y2="11.5"/></svg>${type==='edit-nodeal'?'修改未達成原因':'未達成 — 填寫原因'}</div>
+      <div class="modal-sub">${q.client}（${q.id}）</div>
+      <div class="fl"><div class="fl-label">未達成原因 <span class="fl-required">*</span></div><textarea id="m-reason" placeholder="例：客戶認為報價偏高，決定向其他供應商採購">${q.nodealReason||''}</textarea></div>
+      <div class="modal-footer"><button class="mf-cancel" data-maction="close">取消</button><button class="mf-ok gray" data-maction="do-nodeal" data-id="${id}">確認記錄</button></div>`);
+  } else if(type==='resubmit'){
+    fstore.rs={q:[],v:[]};
+    openModal(`<div class="modal-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#BA7517"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>重新送審</div>
+      <div class="modal-sub">${q.client}（${q.id}）— 依主管備註修改後重新上傳</div>
+      <div class="rbox rj" style="margin-bottom:14px"><div class="rlabel rj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>主管退件原因</div>${q.rejectReason}</div>
+      <div class="fl"><div class="fl-label">廠商 / 客戶名稱</div><input type="text" id="rs-client" value="${q.client}"></div>
+      <div class="fl"><div class="fl-label">廠商類別 <span class="fl-required">*</span></div><select id="rs-cat"><option value="">請選擇</option>${categoryOpts(q.category)}</select></div>
+      <div class="fl"><div class="fl-label">送貨方式 <span class="fl-required">*</span></div><input type="text" id="rs-ship" placeholder="例：冷藏車配送、自取..." value="${q.shipMethod||''}"></div>
+      <div class="fl"><div class="fl-label">重新上傳報價單圖片 <span class="fl-required">*</span></div>${fileInputHTML('rs','q','點擊選取新的報價單圖片','rs-qpv')}</div>
+      <div class="fl"><div class="fl-label">廠商資料圖片（如有更新）</div>${fileInputHTML('rs','v','點擊選取廠商資料圖片','rs-vpv')}</div>
+      <div class="fl"><div class="fl-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;display:inline-block;vertical-align:-0.15em;color:#185FA5"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="13" y2="15"/></svg>備註</div><textarea id="rs-note" placeholder="例：修改後的補充說明...">${q.note||''}</textarea></div>
+      <hr class="divhr">
+      <div class="mini-sec-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#534AB7"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>送樣資訊</div>
+      <div class="fl"><div class="fl-label">是否送樣</div>
+        <div class="radio-row">
+          <label class="radio-opt"><input type="radio" name="rs-samp" value="yes"${q.sample?' checked':''}> 是，需送樣</label>
+          <label class="radio-opt"><input type="radio" name="rs-samp" value="no"${!q.sample?' checked':''}> 否</label>
+        </div>
+      </div>
+      ${sampleBlock('rs',q.sampleNote||'')}
+      <div class="modal-footer"><button class="mf-cancel" data-maction="close">取消</button><button class="mf-ok green" data-maction="do-resubmit" data-id="${id}">重新送審</button></div>`);
+    const sec=document.getElementById('rs-ssec');
+    if(q.sample)sec.style.display='block';
+    bindSampleToggle('rs');
+  } else if(type==='new'){
+    fstore.nw={q:[],v:[]};
+    openModal(`<div class="modal-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#2a7a3a"><path d="M14 3v4a1 1 0 001 1h4"/><path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/><line x1="9" y1="9" x2="10" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>上傳新報價單</div>
+      <div class="modal-sub" style="margin-bottom:16px">填寫資訊並上傳圖片，送出後等待主管簽核</div>
+      <div class="fl"><div class="fl-label">廠商 / 客戶名稱 <span class="fl-required">*</span></div><input type="text" id="nw-client" placeholder="例：全聯福利中心"></div>
+      <div class="fl"><div class="fl-label">廠商類別 <span class="fl-required">*</span></div><select id="nw-cat"><option value="">請選擇類別</option>${categoryOpts('')}</select></div>
+      <div class="fl"><div class="fl-label">送貨方式 <span class="fl-required">*</span></div><input type="text" id="nw-ship" placeholder="例：冷藏車配送、自取、業務配送..."></div>
+      <div class="fl"><div class="fl-label">報價單圖片 <span class="fl-required">*</span></div>${fileInputHTML('nw','q','點擊或拖曳上傳報價單圖片','nw-qpv')}</div>
+      <div class="fl"><div class="fl-label">廠商資料圖片</div>${fileInputHTML('nw','v','點擊或拖曳上傳廠商資料圖片','nw-vpv')}</div>
+      <div class="fl"><div class="fl-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;display:inline-block;vertical-align:-0.15em;color:#185FA5"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="13" y2="15"/></svg>備註</div><textarea id="nw-note" placeholder="例：客戶要求特殊規格、特殊包裝需求、報價有效期限..."></textarea></div>
+      <hr class="divhr">
+      <div class="mini-sec-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#534AB7"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>送樣資訊</div>
+      <div class="fl"><div class="fl-label">是否送樣</div>
+        <div class="radio-row">
+          <label class="radio-opt"><input type="radio" name="nw-samp" value="yes"> 是，需送樣</label>
+          <label class="radio-opt"><input type="radio" name="nw-samp" value="no" checked> 否</label>
+        </div>
+      </div>
+      ${sampleBlock('nw','')}
+      <div class="modal-footer"><button class="mf-cancel" data-maction="close">取消</button><button class="mf-ok green" data-maction="do-new">提交等待簽核</button></div>`);
+    bindSampleToggle('nw');
+  }
+}
+
+function openModal(html){
+  closeModal();
+  const ov=document.createElement('div');ov.className='modal-wrap';
+  ov.innerHTML=`<div class="modal">${html}</div>`;
+  ov.addEventListener('click',function(e){if(e.target===ov)closeModal();});
+  document.body.appendChild(ov);modalEl=ov;
+}
+function closeModal(){if(modalEl){modalEl.remove();modalEl=null;}}
+
+function renderContent(){
+  const isMgr=role==='manager';let h='';
+
+  if(page==='deal'){
+    const list=quotes.filter(q=>q.deal==='yes');
+    h+=`<div class="page-hd"><div class="page-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#2a7a3a"><path d="M20.42 4.58a5.4 5.4 0 00-7.65 0l-.77.78-.77-.78a5.4 5.4 0 00-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg>達成共識</div><div class="page-sub">客戶已接受報價，交易成立</div></div>`;
+    h+=`<div class="card-list">${list.length?list.map(q=>resultCardHtml(q)).join(''):empty('尚無達成案件')}</div>`;
+    document.getElementById('content').innerHTML=h;return;
+  }
+  if(page==='nodeal'){
+    const list=quotes.filter(q=>q.deal==='no');
+    h+=`<div class="page-hd"><div class="page-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#A32D2D"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>未達成</div><div class="page-sub">客戶未接受，已記錄原因留存</div></div>`;
+    h+=`<div class="card-list">${list.length?list.map(q=>resultCardHtml(q)).join(''):empty('尚無未達成案件')}</div>`;
+    document.getElementById('content').innerHTML=h;return;
+  }
+  if(page==='toSend'){
+    const notSent=quotes.filter(q=>q.status==='approved'&&!q.sent&&!q.deal);
+    const alreadySent=quotes.filter(q=>q.status==='approved'&&q.sent&&!q.deal);
+    h+=`<div class="page-hd"><div class="page-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#185FA5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>待傳送客戶</div><div class="page-sub">審核通過的報價單，可在此標記傳送狀態與交易結果</div></div>`;
+    h+=`<div class="two-section">`;
+    h+=`<div><div class="subsec-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:15px;height:15px;color:#185FA5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span style="font-size:13px;font-weight:600;color:#185FA5">尚未傳送</span><span class="subsec-badge bc-blue">${notSent.length} 件</span></div><div class="card-list">${notSent.length?notSent.map(q=>stdCardHtml(q,isMgr,{showFollow:true})).join(''):empty('目前所有案件皆已傳送')}</div></div>`;
+    h+=`<div><div class="subsec-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:15px;height:15px;color:#2a7a3a"><path d="M7 12l5 5 10-10"/><path d="M2 12l5 5"/></svg><span style="font-size:13px;font-weight:600;color:#2a7a3a">已傳送（待回覆）</span><span class="subsec-badge bc-green">${alreadySent.length} 件</span></div><div class="card-list">${alreadySent.length?alreadySent.map(q=>stdCardHtml(q,isMgr,{showFollow:true})).join(''):empty('尚無已傳送案件')}</div></div>`;
+    h+=`</div>`;
+    document.getElementById('content').innerHTML=h;return;
+  }
+  if(page==='sentAll'){
+    const dealYes=quotes.filter(q=>q.sent&&q.deal==='yes');
+    const dealNo=quotes.filter(q=>q.sent&&q.deal==='no');
+    const dealPend=quotes.filter(q=>q.sent&&!q.deal);
+    h+=`<div class="page-hd"><div class="page-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#2a7a3a"><path d="M7 12l5 5 10-10"/><path d="M2 12l5 5"/></svg>已傳送給客戶</div><div class="page-sub">所有已傳送案件，含達成共識、未達成及待回覆</div></div>`;
+    h+=`<div class="sent-section"><div class="sent-sec-hd pending-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#185FA5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span style="font-size:13px;font-weight:600;color:#185FA5;margin-left:4px">待客戶回覆</span><span class="sb-badge bc-blue" style="margin-left:10px">${dealPend.length}</span></div><div class="card-list">${dealPend.length?dealPend.map(q=>stdCardHtml(q,isMgr,{showFollow:true})).join(''):empty('無待回覆案件')}</div></div>`;
+    h+=`<div class="sent-section"><div class="sent-sec-hd deal-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#1a5c2a"><path d="M20.42 4.58a5.4 5.4 0 00-7.65 0l-.77.78-.77-.78a5.4 5.4 0 00-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg><span style="font-size:13px;font-weight:600;color:#1a5c2a;margin-left:4px">達成共識</span><span class="sb-badge bc-green" style="margin-left:10px">${dealYes.length}</span></div><div class="card-list">${dealYes.length?dealYes.map(q=>resultCardHtml(q)).join(''):empty('尚無達成案件')}</div></div>`;
+    h+=`<div class="sent-section"><div class="sent-sec-hd nodeal-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#791F1F"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span style="font-size:13px;font-weight:600;color:#791F1F;margin-left:4px">未達成</span><span class="sb-badge bc-red" style="margin-left:10px">${dealNo.length}</span></div><div class="card-list">${dealNo.length?dealNo.map(q=>resultCardHtml(q)).join(''):empty('尚無未達成案件')}</div></div>`;
+    document.getElementById('content').innerHTML=h;return;
+  }
+
+  // ── 已結案頁面 ──
+  if(page==='closed'){
+    const dealYes=quotes.filter(q=>q.sent&&q.deal==='yes');
+    const dealNo=quotes.filter(q=>q.sent&&q.deal==='no');
+    const dealPend=quotes.filter(q=>q.sent&&!q.deal);
+    h+=`<div class="page-hd"><div class="page-title">${icon('ti-archive','16px',null)}已結案</div><div class="page-sub">所有已傳送給客戶的案件</div></div>`;
+    h+=`<div class="sent-section"><div class="sent-sec-hd pending-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:#185FA5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span style="font-size:13px;font-weight:600;color:#185FA5;margin-left:4px">待客戶回覆</span><span class="sb-badge bc-blue" style="margin-left:10px">${dealPend.length}</span></div><div class="card-list">${dealPend.length?dealPend.map(q=>stdCardHtml(q,isMgr,{showFollow:true})).join(''):empty('無待回覆案件')}</div></div>`;
+    h+=`<div class="sent-section"><div class="sent-sec-hd deal-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:#1a5c2a"><path d="M20.42 4.58a5.4 5.4 0 00-7.65 0l-.77.78-.77-.78a5.4 5.4 0 00-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg><span style="font-size:13px;font-weight:600;color:#1a5c2a;margin-left:4px">達成共識</span><span class="sb-badge bc-green" style="margin-left:10px">${dealYes.length}</span></div><div class="card-list">${dealYes.length?dealYes.map(q=>resultCardHtml(q)).join(''):empty('尚無達成案件')}</div></div>`;
+    h+=`<div class="sent-section"><div class="sent-sec-hd nodeal-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:#791F1F"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span style="font-size:13px;font-weight:600;color:#791F1F;margin-left:4px">未達成</span><span class="sb-badge bc-red" style="margin-left:10px">${dealNo.length}</span></div><div class="card-list">${dealNo.length?dealNo.map(q=>resultCardHtml(q)).join(''):empty('尚無未達成案件')}</div></div>`;
+    document.getElementById('content').innerHTML=h;return;
+  }
+
+    const cfgs={
+    pending:{title:'待審核',sub:'等待主管簽核的報價單',icon:'ti-clock',filter:q=>q.status==='pending'},
+    approved:{title:isMgr?'審核通過':'已通過',sub:'審核通過、尚未傳送給客戶的報價單',icon:'ti-circle-check',filter:q=>q.status==='approved'&&!q.sent},
+    rejected:{title:isMgr?'審核未通過':'需修改',sub:isMgr?'已退件，業務需修改後重新送審':'請依主管備註修改後重新送審',icon:'ti-circle-x',filter:q=>q.status==='rejected'},
+  };
+  const cfg=cfgs[page]||cfgs.pending;
+  const list=quotes.filter(cfg.filter);
+  const showUpload=!isMgr&&page==='pending';
+  const showFollow=page==='approved'; // approved page = unsent, show send button
+  let statsHtml='';
+  if(page==='pending'){
+    const ct=C();
+    statsHtml=`<div class="stats-row">
+      <div class="stat-c"><div class="stat-label">總報價單數</div><div class="stat-val">${quotes.length}</div></div>
+      <div class="stat-c"><div class="stat-label">待審核</div><div class="stat-val sv-a">${ct.pending}</div></div>
+      <div class="stat-c"><div class="stat-label">本月達成共識</div><div class="stat-val sv-g">${ct.deal}</div></div>
+    </div>`;
+  }
+  document.getElementById('content').innerHTML=`
+    <div class="page-hd">
+      <div class="page-title">${icon(cfg.icon,'16px',null)}${cfg.title}</div>
+      <div class="page-sub">${cfg.sub}</div>
+    </div>
+    ${statsHtml}
+    ${showUpload?`<div class="upload-cta" data-action="open-new">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:24px;height:24px;color:#3a9e50"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+      <div style="font-size:13px;font-weight:600;margin:6px 0 3px;color:#1A1A1A">上傳新報價單</div>
+      <div style="font-size:12px;color:#888">點擊上傳報價單與廠商資料圖片，送出後等待主管簽核</div>
+      <button class="ba approve" data-action="open-new" style="margin-top:10px">+ 新增報價單</button>
+    </div>`:''}
+    <div class="card-list">${list.length?list.map(q=>stdCardHtml(q,isMgr,{showFollow})).join(''):empty('此分類目前沒有案件')}</div>`;
+}
+
+function render(){renderSidebar();renderContent();}
+
+function showNotif(msg,color){
+  const n=document.getElementById('_ntf');
+  n.style.background=color||'#2a7a3a';n.textContent=msg;n.style.opacity='1';
+  setTimeout(()=>n.style.opacity='0',2400);
+}
+function animThen(id,fn){
+  const c=document.getElementById('card-'+id);if(c)c.classList.add('moving');
+  setTimeout(()=>{fn();render();},210);
+}
+
+// ── Event: file uploads (capture real images) ──
+document.addEventListener('change',function(e){
+  const inp=e.target;
+  if(inp.type==='file'&&inp.dataset.fp){
+    const pfx=inp.dataset.fp, type=inp.dataset.ft;
+    if(!fstore[pfx])fstore[pfx]={};
+    fstore[pfx][type]=[];
+    const pv=document.getElementById(pfx+'-'+type+'pv');
+    Array.from(inp.files).forEach(file=>{
+      fstore[pfx][type].push(file.name);
+      // Store image as dataURL for preview
+      const reader=new FileReader();
+      reader.onload=function(ev){imageCache[file.name]=ev.target.result;};
+      reader.readAsDataURL(file);
+    });
+    if(pv) pv.innerHTML=fstore[pfx][type].map(n=>`<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:11px;height:11px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>${n}</span>`).join('');
+  }
+});
+
+// ── Main click handler ──
+document.addEventListener('click',function(e){
+  if(lightboxEl&&!e.target.closest('.lightbox')){closeLightbox();return;}
+  if(!e.target.closest('.rc-menu-wrap')&&openDropdownId){openDropdownId=null;render();return;}
+
+  const sb=e.target.closest('[data-page]');
+  if(sb){openDropdownId=null;closeLightbox();page=sb.dataset.page;render();return;}
+
+  const btn=e.target.closest('[data-action]');
+  if(btn){
+    const a=btn.dataset.action, id=btn.dataset.id;
+    if(a==='preview'){
+      const files=JSON.parse(decodeURIComponent(btn.dataset.files));
+      openLightbox(files,parseInt(btn.dataset.idx)||0);return;
+    }
+    if(a==='toggle-menu'){openDropdownId=(openDropdownId===id)?null:id;render();return;}
+    if(a==='change-to-nodeal'){openDropdownId=null;const q=quotes.find(q=>q.id===id);showConfirm({titleHtml:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#A32D2D"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> 確認修改為未達成？`,sub:`「${q.client}」目前為達成共識，確定要改為未達成嗎？`,btnCls:'confirm-nodeal',btnLabel:'確認修改',onOk:()=>buildModal('nodeal',id)});return;}
+    if(a==='change-to-deal'){openDropdownId=null;const q=quotes.find(q=>q.id===id);showConfirm({titleHtml:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#2a7a3a"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> 確認修改為達成共識？`,sub:`「${q.client}」目前為未達成，確定要改為達成共識嗎？`,btnCls:'confirm-deal',btnLabel:'確認修改',onOk:()=>{(async()=>{
+          const res=await apiPost({action:'update',id:id,field:'deal',value:'yes'});
+          if(res&&res.success){const q=quotes.find(q=>q.id===id);q.deal='yes';q.nodealReason=null;showNotif('✓ 已改為達成共識');render();}
+          else showNotif('操作失敗，請重試','#A32D2D');
+        })();}});return;}
+    if(a==='edit-nodeal-reason'){openDropdownId=null;buildModal('edit-nodeal',id);return;}
+    if(a==='clear-result'){openDropdownId=null;const q=quotes.find(q=>q.id===id);showConfirm({titleHtml:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;color:#5F5E5A"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> 確認清除結果？`,sub:`「${q.client}」的交易結果將被清除，案件回到待回覆狀態。`,btnCls:'confirm-clear',btnLabel:'確認清除',onOk:()=>{(async()=>{
+          const res=await apiPost({action:'update',id:id,field:'deal',value:''});
+          if(res&&res.success){const q=quotes.find(q=>q.id===id);q.deal=null;q.nodealReason=null;showNotif('已清除交易結果','#5F5E5A');render();}
+          else showNotif('操作失敗，請重試','#A32D2D');
+        })();}});return;}
+    if(a==='open-new'){buildModal('new');return;}
+    if(a==='approve'){
+      (async()=>{
+        showNotif('處理中...','#185FA5');
+        const res = await apiPost({action:'approve',id:id});
+        if(res && res.success){
+          animThen(id,()=>{quotes.find(q=>q.id===id).status='approved';showNotif('✓ 已簽核通過 '+id);});
+        } else {
+          showNotif('操作失敗，請重試','#A32D2D');
+        }
+      })();return;}
+    if(a==='reject'){buildModal('reject',id);return;}
+    if(a==='sent'){
+      (async()=>{
+        const q=quotes.find(q=>q.id===id);
+        const newSent=!q.sent;
+        showNotif('處理中...','#185FA5');
+        const res = await apiPost({action:'update',id:id,field:'sent',value:newSent?'yes':'no'});
+        if(res && res.success){
+          q.sent=newSent;
+          showNotif(newSent?'✓ 已標記傳送給客戶':'已取消傳送標記');
+          render();
+        } else {
+          showNotif('操作失敗，請重試','#A32D2D');
+        }
+      })();return;}
+    if(a==='deal'){
+      (async()=>{
+        showNotif('處理中...','#185FA5');
+        const res = await apiPost({action:'update',id:id,field:'deal',value:'yes'});
+        if(res && res.success){
+          const q=quotes.find(q=>q.id===id);q.deal='yes';q.nodealReason=null;
+          showNotif('✓ 達成交易共識！');render();
+        } else {
+          showNotif('操作失敗，請重試','#A32D2D');
+        }
+      })();return;}
+    if(a==='nodeal'){buildModal('nodeal',id);return;}
+    if(a==='clear-deal'){const q=quotes.find(q=>q.id===id);q.deal=null;q.nodealReason=null;apiPost({action:'update',id:id,field:'deal',value:''});render();return;}
+    if(a==='resubmit'){buildModal('resubmit',id);return;}
+    return;
+  }
+
+  const mb=e.target.closest('[data-maction]');
+  if(mb){
+    const ma=mb.dataset.maction, id=mb.dataset.id;
+    if(ma==='close'){closeModal();return;}
+    if(ma==='do-reject'){
+      const r=document.getElementById('m-reason').value.trim();
+      if(!r){showNotif('請填寫退件原因','#A32D2D');return;}
+      closeModal();
+      (async()=>{
+        showNotif('處理中...','#185FA5');
+        const res = await apiPost({action:'reject',id:id,reason:r});
+        if(res && res.success){
+          animThen(id,()=>{const q=quotes.find(q=>q.id===id);q.status='rejected';q.rejectReason=r;showNotif('已退件','#A32D2D');});
+        } else {
+          showNotif('操作失敗，請重試','#A32D2D');
+        }
+      })();return;
+    }
+    if(ma==='do-nodeal'){
+      const r=document.getElementById('m-reason').value.trim();
+      if(!r){showNotif('請填寫未達成原因','#5F5E5A');return;}
+      closeModal();
+      (async()=>{
+        showNotif('處理中...','#185FA5');
+        await apiPost({action:'update',id:id,field:'nodealReason',value:r});
+        const res = await apiPost({action:'update',id:id,field:'deal',value:'no'});
+        if(res && res.success){
+          const q=quotes.find(q=>q.id===id);q.deal='no';q.nodealReason=r;
+          showNotif('已記錄未達成原因','#5F5E5A');render();
+        } else {
+          showNotif('操作失敗，請重試','#A32D2D');
+        }
+      })();return;
+    }
+    if(ma==='do-resubmit'){
+      closeModal();
+      animThen(id,()=>{
+        const q=quotes.find(q=>q.id===id);
+        q.status='pending';q.rejectReason=null;
+        const nc=document.getElementById('rs-client')?.value.trim();if(nc)q.client=nc;
+        const cat=document.getElementById('rs-cat')?.value;if(cat)q.category=cat;
+        const ship=document.getElementById('rs-ship')?.value.trim();if(ship)q.shipMethod=ship;
+        if(fstore.rs.q&&fstore.rs.q.length)q.qf=fstore.rs.q;
+        if(fstore.rs.v&&fstore.rs.v.length)q.vf=fstore.rs.v;
+        const hs=document.querySelector('[name="rs-samp"]:checked')?.value==='yes';
+        q.sample=hs;q.sampleNote=hs?(document.getElementById('rs-snote')?.value.trim()||''):'';
+        const rn=document.getElementById('rs-note')?.value.trim();if(rn!==undefined)q.note=rn;
+        apiPost({action:'resubmit',id:id,updates:{client:q.client,category:q.category,shipMethod:q.shipMethod,note:q.note,sample:q.sample?'yes':'no',sampleNote:q.sampleNote,qf:q.qf,vf:q.vf}});
+        showNotif('✓ 已重新送審，等待主管簽核');
+      });return;
+    }
+    if(ma==='do-new'){
+      const client=document.getElementById('nw-client').value.trim();
+      const cat=document.getElementById('nw-cat').value;
+      const ship=document.getElementById('nw-ship').value.trim();
+      if(!client||!cat||!ship){showNotif('請填寫廠商名稱、類別與送貨方式','#A32D2D');return;}
+      const hs=document.querySelector('[name="nw-samp"]:checked')?.value==='yes';
+      const noteVal=document.getElementById('nw-note')?.value.trim()||'';
+      const snoteVal=hs?(document.getElementById('nw-snote')?.value.trim()||''):'';
+
+      closeModal();
+      showNotif('上傳中，請稍候...','#185FA5');
+
+      (async()=>{
+        // 上傳圖片到 Google Drive
+        const qUrls = [];
+        const vUrls = [];
+
+        if(!LOCAL_MODE){
+          // 上傳報價單圖片
+          if(fstore.nw&&fstore.nw.q&&fstore.nw.q.length){
+            for(const fname of fstore.nw.q){
+              const dataUrl = imageCache[fname];
+              if(dataUrl){
+                const base64 = dataUrl.split(',')[1];
+                const mimeType = dataUrl.split(';')[0].split(':')[1];
+                const res = await apiPost({action:'upload', filename:fname, base64, mimeType});
+                qUrls.push(res&&res.url ? res.url : fname);
+              } else {
+                qUrls.push(fname);
+              }
+            }
+          }
+          // 上傳廠商資料圖片
+          if(fstore.nw&&fstore.nw.v&&fstore.nw.v.length){
+            for(const fname of fstore.nw.v){
+              const dataUrl = imageCache[fname];
+              if(dataUrl){
+                const base64 = dataUrl.split(',')[1];
+                const mimeType = dataUrl.split(';')[0].split(':')[1];
+                const res = await apiPost({action:'upload', filename:fname, base64, mimeType});
+                vUrls.push(res&&res.url ? res.url : fname);
+              } else {
+                vUrls.push(fname);
+              }
+            }
+          }
+        }
+
+        const newQuote = {
+          client, person:currentUser||'我', category:cat, shipMethod:ship,
+          note:noteVal, date:new Date().toISOString().slice(0,10),
+          sample:hs?'yes':'no', sampleNote:snoteVal,
+          qf: qUrls.length ? qUrls : (fstore.nw&&fstore.nw.q||[]),
+          vf: vUrls.length ? vUrls : (fstore.nw&&fstore.nw.v||[]),
+        };
+
+        const result = await apiPost({action:'create', quote:newQuote});
+        if(result && result.success){
+          newQuote.id = result.id;
+          newQuote.status = 'pending';
+          newQuote.sent = false;
+          newQuote.deal = null;
+          newQuote.nodealReason = null;
+          newQuote.rejectReason = null;
+          quotes.unshift(newQuote);
+          showNotif('✓ 報價單已儲存，等待主管簽核');
+          render();
+        } else if(LOCAL_MODE){
+          const newId='BJ-'+(String(quotes.length+1).padStart(3,'0'));
+          newQuote.id=newId; newQuote.status='pending'; newQuote.sent=false;
+          newQuote.deal=null; newQuote.nodealReason=null; newQuote.rejectReason=null;
+          quotes.unshift(newQuote);
+          showNotif('✓ 報價單已上傳（本機模式）');
+          render();
+        } else {
+          showNotif('儲存失敗，請重試','#A32D2D');
+        }
+      })();
+      return;
+    }
+  }
+});
+
+// ── Role switch ──
+document.getElementById('role-sw').addEventListener('click',function(e){
+  const btn=e.target.closest('.role-btn');if(!btn)return;
+  role=btn.dataset.role;page='pending';openDropdownId=null;closeLightbox();
+  currentUserRole=role;
+  localStorage.setItem('bj_role',role);
+  document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');render();
+});
+
+function render(){renderSidebar();renderContent();updateBottomNav();}
+
+// ── Bottom nav (mobile) ──
+window.bnNav=function(p){
+  page=p;openDropdownId=null;closeLightbox();
+  const menu=document.getElementById('bn-more-menu');
+  if(menu)menu.classList.remove('open');
+  render();
+  window.scrollTo(0,0);
+};
+window.toggleBnMore=function(){
+  const menu=document.getElementById('bn-more-menu');
+  if(menu)menu.classList.toggle('open');
+};
+function updateBottomNav(){
+  const c=C();
+  const rb=document.getElementById('bn-rejected-badge');
+  const sb=document.getElementById('bn-closed-badge');
+  const nb=document.getElementById('bn-nodeal-badge');
+  const db=document.getElementById('bn-deal-badge');
+  if(rb){rb.textContent=c.rejected||'';rb.style.display=c.rejected?'':'none';}
+  if(sb){sb.textContent=c.closed||'';sb.style.display=c.closed?'':'none';}
+  if(nb){nb.textContent=c.nodeal||'';nb.style.display=c.nodeal?'':'none';}
+  if(db){db.textContent=c.deal||'';db.style.display=c.deal?'':'none';}
+  document.querySelectorAll('.bn-item[data-bnpage]').forEach(b=>b.classList.toggle('active',b.dataset.bnpage===page));
+  document.querySelectorAll('.bn-more-item[data-bnpage]').forEach(b=>b.classList.toggle('active',b.dataset.bnpage===page));
+  document.getElementById('bn-more-btn')?.classList.toggle('active',['deal','nodeal','closed'].includes(page));
+}
+
+
+// ══════════════════════════════════════════
+//  API 函數
+// ══════════════════════════════════════════
+
+async function apiGet(params) {
+  if (LOCAL_MODE) return null;
+  try {
+    const url = API_URL + '?' + new URLSearchParams(params);
+    const res = await fetch(url);
+    return await res.json();
+  } catch(e) {
+    console.error('API GET error:', e);
+    return null;
+  }
+}
+
+async function apiPost(data) {
+  if (LOCAL_MODE) return null;
+  try {
+    // Apps Script 接受 text/plain POST，不需要 preflight
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      redirect: 'follow'
+    });
+    const text = await res.text();
+    // Apps Script 回傳可能包在 HTML 或是純 JSON
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      try { return JSON.parse(jsonMatch[0]); } catch(e) {}
+    }
+    try { return JSON.parse(text); } catch(e) {}
+    return null;
+  } catch(e) {
+    console.error('API error:', e.message);
+    return null;
+  }
+}
+
+
+// 上傳圖片 → 返回 Google Drive URL
+async function uploadFile(file) {
+  if (LOCAL_MODE) return file.name; // 本機模式只回傳檔名
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64 = e.target.result.split(',')[1];
+      const result = await apiPost({
+        action: 'upload',
+        filename: file.name,
+        base64: base64,
+        mimeType: file.type
+      });
+      if (result && result.url) resolve(result.url);
+      else resolve(file.name);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// 從 API 載入所有報價單
+async function loadQuotes() {
+  if (LOCAL_MODE) return; // 使用內建假資料
+  setApiStatus('loading', '載入中...');
+  const data = await apiGet({ action: 'list' });
+  if (data && Array.isArray(data)) {
+    quotes = data.map(q => ({
+      ...q,
+      // Normalize fields from API
+      sent: q.sent === true || q.sent === 'yes',
+      sample: q.sample === true || q.sample === 'yes',
+      deal: q.deal === 'yes' ? 'yes' : q.deal === 'no' ? 'no' : null,
+      nodealReason: q.nodealReason || null,
+      rejectReason: q.rejectReason || null,
+    }));
+    setApiStatus('online', '已連線');
+  } else {
+    setApiStatus('offline', '離線模式');
+  }
+  render();
+}
+
+function setApiStatus(state, text) {
+  const el = document.getElementById('api-status-badge');
+  if (!el) return;
+  el.className = 'api-status ' + state;
+  el.textContent = text;
+}
+
+// ── 登入邏輯 ──
+function initLogin() {
+  if (currentUser) {
+    // 已登入，直接顯示系統
+    applyLogin(currentUser, currentUserRole);
+    return;
+  }
+  // 顯示登入畫面
+  document.getElementById('login-overlay').style.display = 'flex';
+
+  document.getElementById('login-btn').addEventListener('click', doLogin);
+  document.getElementById('login-name').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('login-pw').focus();
+  });
+  document.getElementById('login-pw').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doLogin();
+  });
+}
+
+// 密碼設定（可自行修改）
+const PASSWORDS = {
+  'sales': 'beanjoy2024',    // 業務人員密碼
+  'manager': 'bj@manager'    // 業務主管密碼
+};
+
+function doLogin() {
+  const name = document.getElementById('login-name').value.trim();
+  const pw = document.getElementById('login-pw').value;
+  const roleEl = document.querySelector('input[name="login-role"]:checked');
+  const loginRole = roleEl ? roleEl.value : 'sales';
+  const errEl = document.getElementById('login-err');
+  if (!name) {
+    errEl.textContent = '請輸入您的姓名';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (pw !== PASSWORDS[loginRole]) {
+    errEl.textContent = '密碼錯誤，請重新輸入';
+    errEl.style.display = 'block';
+    document.getElementById('login-pw').value = '';
+    return;
+  }
+  errEl.style.display = 'none';
+  localStorage.setItem('bj_user', name);
+  localStorage.setItem('bj_role', loginRole);
+  currentUser = name;
+  currentUserRole = loginRole;
+  document.getElementById('login-overlay').style.display = 'none';
+  applyLogin(name, loginRole);
+}
+
+function applyLogin(name, loginRole) {
+  role = loginRole;
+  // 更新角色切換按鈕
+  document.querySelectorAll('.role-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.role === loginRole);
+  });
+  // 加入 API 狀態徽章到 topbar
+  const brandInfo = document.querySelector('.brand-info');
+  if (brandInfo && !document.getElementById('api-status-badge')) {
+    const badge = document.createElement('span');
+    badge.id = 'api-status-badge';
+    badge.className = 'api-status ' + (LOCAL_MODE ? 'offline' : 'loading');
+    badge.textContent = LOCAL_MODE ? '本機模式' : '連線中...';
+    brandInfo.appendChild(badge);
+  }
+  // 顯示登出按鈕
+  const topbar = document.querySelector('.topbar');
+  if (topbar && !document.getElementById('logout-btn')) {
+    const logoutBtn = document.createElement('button');
+    logoutBtn.id = 'logout-btn';
+    logoutBtn.textContent = name;
+    logoutBtn.style.cssText = 'font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:transparent;cursor:pointer;color:var(--text2);margin-left:8px';
+    logoutBtn.title = '點擊登出';
+    logoutBtn.addEventListener('click', function() {
+      if (confirm('確定要登出？')) {
+        localStorage.removeItem('bj_user');
+        localStorage.removeItem('bj_role');
+        location.reload();
+      }
+    });
+    document.querySelector('.role-sw').after(logoutBtn);
+  }
+  render();
+  if (!LOCAL_MODE) loadQuotes();
+}
+
+// 包裝 API 同步的動作
+async function syncAction(action, id, extra) {
+  if (LOCAL_MODE) return;
+  const payload = { action, id, ...extra };
+  const result = await apiPost(payload);
+  if (result && result.error) {
+    showNotif('同步失敗：' + result.error, '#A32D2D');
+  }
+}
+
+
+initLogin();
+
+// 每 30 秒自動從試算表載入最新資料
+setInterval(async function() {
+  if (LOCAL_MODE || !currentUser) return;
+  const data = await apiGet({ action: 'list' });
+  if (data && Array.isArray(data)) {
+    quotes = data.map(q => ({
+      ...q,
+      sent: q.sent === true || q.sent === 'yes',
+      sample: q.sample === true || q.sample === 'yes',
+      deal: q.deal === 'yes' ? 'yes' : q.deal === 'no' ? 'no' : null,
+      nodealReason: q.nodealReason || null,
+      rejectReason: q.rejectReason || null,
+    }));
+    render();
+  }
+}, 30000);
+
+})();
+</script>
+
+<!-- Bottom nav for mobile -->
+<div class="bottom-nav" id="bottom-nav">
+  <button class="bn-item" data-bnpage="pending" onclick="bnNav('pending')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    待審核
+  </button>
+  <button class="bn-item" data-bnpage="approved" onclick="bnNav('approved')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+    已通過
+  </button>
+  <button class="bn-item" data-bnpage="rejected" onclick="bnNav('rejected')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+    未通過
+  </button>
+  <button class="bn-item" data-bnpage="closed" onclick="bnNav('closed')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+    已結案
+  </button>
+  <button class="bn-item" id="bn-more-btn" onclick="toggleBnMore()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+    更多
+  </button>
+</div>
+<div class="bn-more-menu" id="bn-more-menu">
+  <div class="bn-more-item" data-bnpage="deal" onclick="bnNav('deal')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M20.42 4.58a5.4 5.4 0 00-7.65 0l-.77.78-.77-.78a5.4 5.4 0 00-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg>
+    達成共識
+    <span class="bn-badge green" id="bn-deal-badge"></span>
+  </div>
+  <div class="bn-more-item" data-bnpage="nodeal" onclick="bnNav('nodeal')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    未達成
+    <span class="bn-badge red" id="bn-nodeal-badge"></span>
+  </div>
+  <div class="bn-more-item" data-bnpage="closed" onclick="bnNav('closed')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+    全部結案
+    <span class="bn-badge" id="bn-closed-badge"></span>
+  </div>
+</div>
+</body>
+</html>
