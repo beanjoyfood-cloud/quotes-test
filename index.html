@@ -1154,8 +1154,13 @@ async function apiGet(params) {
   if (LOCAL_MODE) return null;
   try {
     const url = API_URL + '?' + new URLSearchParams(params);
-    const res = await fetch(url);
-    return await res.json();
+    const res = await fetch(url, { redirect: 'follow' });
+    const text = await res.text();
+    try { return JSON.parse(text); } catch(e) {
+      const m = text.match(/\[[\s\S]*\]|\{[\s\S]*\}/);
+      if (m) return JSON.parse(m[0]);
+      return null;
+    }
   } catch(e) {
     console.error('API GET error:', e);
     return null;
