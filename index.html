@@ -398,9 +398,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto
       <div class="brand-company">中港興食品股份有限公司</div>
     </div>
   </div>
-  <div class="role-sw" id="role-sw">
-    <button class="role-btn active" data-role="sales"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:13px;height:13px;margin-right:3px"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>業務人員</button>
-    <button class="role-btn" data-role="manager"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:13px;height:13px;margin-right:3px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>業務主管</button>
+  <div style="display:flex;align-items:center;gap:6px">
+    <div class="role-sw" id="role-sw">
+      <button class="role-btn active" data-role="sales"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:13px;height:13px;margin-right:3px"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>業務人員</button>
+      <button class="role-btn" data-role="manager"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0;width:13px;height:13px;margin-right:3px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>業務主管</button>
+    </div>
+    <button onclick="doLogout()" style="font-size:11px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:transparent;cursor:pointer;color:var(--text2);white-space:nowrap">登出</button>
   </div>
 </div>
 <div class="body">
@@ -1115,6 +1118,11 @@ document.getElementById('role-sw').addEventListener('click',function(e){
 function render(){renderSidebar();renderContent();updateBottomNav();}
 
 // ── Bottom nav (mobile) ──
+window.doLogout=function(){
+  localStorage.removeItem('bj_user');
+  localStorage.removeItem('bj_role');
+  location.reload();
+};
 window.bnNav=function(p){
   page=p;openDropdownId=null;closeLightbox();
   const menu=document.getElementById('bn-more-menu');
