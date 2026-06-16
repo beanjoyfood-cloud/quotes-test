@@ -1243,14 +1243,11 @@ function setApiStatus(state, text) {
 
 // ── 登入邏輯 ──
 function initLogin() {
-  // 每次開啟都重新登入（確保資料同步）
-  localStorage.removeItem('bj_user');
-  localStorage.removeItem('bj_role');
-  currentUser = '';
-  currentUserRole = 'sales';
-  // 顯示登入畫面
+  if (currentUser) {
+    applyLogin(currentUser, currentUserRole);
+    return;
+  }
   document.getElementById('login-overlay').style.display = 'flex';
-
   document.getElementById('login-btn').addEventListener('click', doLogin);
   document.getElementById('login-name').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') document.getElementById('login-pw').focus();
