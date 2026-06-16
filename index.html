@@ -1329,7 +1329,10 @@ function applyLogin(name, loginRole) {
     document.querySelector('.role-sw').after(logoutBtn);
   }
   render();
-  if (!LOCAL_MODE) loadQuotes();
+  // 永遠重新載入最新資料
+  if (!LOCAL_MODE) {
+    setTimeout(() => loadQuotes(), 100);
+  }
 }
 
 // 包裝 API 同步的動作
