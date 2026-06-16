@@ -1216,7 +1216,9 @@ async function uploadFile(file) {
 async function loadQuotes() {
   if (LOCAL_MODE) return; // 使用內建假資料
   setApiStatus('loading', '載入中...');
+  console.log('loadQuotes: calling API...');
   const data = await apiGet({ action: 'list' });
+  console.log('loadQuotes: got data:', data ? ('Array:' + data.length) : 'null');
   if (data && Array.isArray(data)) {
     quotes = data.map(q => ({
       ...q,
@@ -1336,6 +1338,7 @@ function applyLogin(name, loginRole) {
   }
   render();
   // 永遠重新載入最新資料
+  console.log('applyLogin: LOCAL_MODE=', LOCAL_MODE, 'API_URL=', API_URL ? 'set' : 'empty');
   if (!LOCAL_MODE) {
     setTimeout(() => loadQuotes(), 100);
   }
