@@ -361,18 +361,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto
       </svg>
     </div>
     <div class="login-title">中港興食品 報價單系統</div>
-    <div class="login-sub">請輸入您的姓名以開始使用</div>
-    <input class="login-input" id="login-name" type="text" placeholder="例：林小明" maxlength="20">
+    <div class="login-sub">請輸入姓名與密碼</div>
+    <input class="login-input" id="login-name" type="text" placeholder="請輸入姓名" maxlength="20" autocomplete="name">
+    <input class="login-input" id="login-pw" type="password" placeholder="請輸入密碼" style="margin-top:-8px" autocomplete="current-password">
     <input class="login-input" id="login-pw" type="password" placeholder="請輸入密碼" style="margin-top:-8px">
     <div class="login-err" id="login-err">請輸入您的姓名</div>
-    <div style="display:flex;gap:10px;margin-bottom:14px">
-      <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border:1.5px solid #DEDEDE;border-radius:8px;cursor:pointer;font-size:13px" id="lbl-sales">
-        <input type="radio" name="login-role" value="sales" checked style="accent-color:#2a7a3a"> 業務人員
-      </label>
-      <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border:1.5px solid #DEDEDE;border-radius:8px;cursor:pointer;font-size:13px" id="lbl-manager">
-        <input type="radio" name="login-role" value="manager" style="accent-color:#2a7a3a"> 業務主管
-      </label>
-    </div>
+
     <button class="login-btn" id="login-btn">進入系統</button>
   </div>
 </div>
