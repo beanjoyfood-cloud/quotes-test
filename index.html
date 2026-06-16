@@ -654,6 +654,7 @@ function stdCardHtml(q,isMgr,opts){
     if(q.status==='pending') acts=`<div class="act-p"><button class="ba approve" data-action="approve" data-id="${q.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>簽核通過</button><button class="ba reject" data-action="reject" data-id="${q.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>退件</button></div>`;
     else if(q.status==='approved') acts=followActions(q);
   } else {
+    if(q.status==='pending') acts=`<button class="ba reject" data-action="delete-quote" data-id="${q.id}" style="width:100%;justify-content:center;margin-top:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>刪除此報價單</button>`;
     if(q.status==='rejected') acts=`<button class="ba resub" data-action="resubmit" data-id="${q.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>依備註修改後重新送審</button>`;
     if(q.status==='approved'&&opts.showFollow) acts=followActions(q);
   }
@@ -921,6 +922,24 @@ document.addEventListener('click',function(e){
           if(res&&res.success){const q=quotes.find(q=>q.id===id);q.deal=null;q.nodealReason=null;showNotif('已清除交易結果','#5F5E5A');render();}
           else showNotif('操作失敗，請重試','#A32D2D');
         })();}});return;}
+    if(a==='delete-quote'){
+      const q=quotes.find(q=>q.id===id);
+      showConfirm({
+        titleHtml:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;color:#A32D2D"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg> 確認刪除？`,
+        sub:`「${q.client}」將被刪除，此動作無法復原。`,
+        btnCls:'confirm-nodeal',
+        btnLabel:'確認刪除',
+        onOk:async()=>{
+          const res = await apiPost({action:'delete',id:id});
+          if(res&&res.success){
+            quotes=quotes.filter(q=>q.id!==id);
+            showNotif('已刪除報價單','#5F5E5A');
+            render();
+          } else {
+            showNotif('刪除失敗，請重試','#A32D2D');
+          }
+        }
+      });return;}
     if(a==='open-new'){buildModal('new');return;}
     if(a==='approve'){
       (async()=>{
