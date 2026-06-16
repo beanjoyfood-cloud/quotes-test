@@ -1294,8 +1294,7 @@ function doLogin() {
   errEl.style.display = 'none';
   // 自動套用角色
   const loginRole = user.role;
-  const roleEl = document.querySelector(\`input[name="login-role"][value="\${loginRole}"]\`);
-  if (roleEl) roleEl.checked = true;
+  // role auto-set
   localStorage.setItem('bj_user', name);
   localStorage.setItem('bj_role', loginRole);
   currentUser = name;
