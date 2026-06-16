@@ -1121,7 +1121,9 @@ function render(){renderSidebar();renderContent();updateBottomNav();}
 window.doLogout=function(){
   localStorage.removeItem('bj_user');
   localStorage.removeItem('bj_role');
-  location.reload();
+  localStorage.clear();
+  sessionStorage.clear();
+  window.location.href = window.location.href.split('?')[0] + '?t=' + Date.now();
 };
 window.bnNav=function(p){
   page=p;openDropdownId=null;closeLightbox();
