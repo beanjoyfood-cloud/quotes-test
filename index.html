@@ -1234,11 +1234,11 @@ function setApiStatus(state, text) {
 
 // ── 登入邏輯 ──
 function initLogin() {
-  if (currentUser) {
-    // 已登入，直接顯示系統
-    applyLogin(currentUser, currentUserRole);
-    return;
-  }
+  // 每次開啟都重新登入（確保資料同步）
+  localStorage.removeItem('bj_user');
+  localStorage.removeItem('bj_role');
+  currentUser = '';
+  currentUserRole = 'sales';
   // 顯示登入畫面
   document.getElementById('login-overlay').style.display = 'flex';
 
